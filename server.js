@@ -1,22 +1,31 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const handlebars = require('express-handlebars');
+const galleryRouter = require('./galleryRouter.js')
 const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extend: true}));
+  app.use('/gallery', galleryRouter)
 
 const db = require('./models');
   const { Gallery } = db;
 
-  app.post('/gallery', function(req, res) {
-    Gallery.create({
-      author: req.body.author,
-      link: req.body.link,
-      description: req.body.description
-      })
-      .then(function (gallery) {
-        res.json(gallery);
-      })
+  const hbs = handlebars.create({
+      extname: '.hbs',
+      default: 'app'
+  });
+    app.engine('hbs', hbs.engine)
+    app.set('view engine', 'hbs');
+
+  app.get('/', function (req, res) {
+    Gallery.findAll()
+    .then(function (gallery) {
+      res.render('index', {
+        gallery: gallery
+      });
+    });
   })
+
 
 
 app.listen(3000, function() {
