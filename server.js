@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const galleryRouter = require('./galleryRouter.js')
+const methodOverride = require('method-override')
 const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extend: true}));
+  app.use(methodOverride('_method'));
   app.use('/gallery', galleryRouter)
 
 const db = require('./models');
