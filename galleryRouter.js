@@ -27,5 +27,26 @@ router.get('/:id', function (req, res) {
     });
 });
 
+router.get('/:id/edit', function (req, res) {
+  Gallery.findById(req.params.id)
+    .then(function (gallery) {
+      res.render('./partials/edit', {gallery: gallery});
+    })
+})
+
+router.put('/:id/edit', function (req, res) {
+  Gallery.findById(req.params.id)
+    .then(function (gallery) {
+      if(gallery) {
+        gallery.updateAttributes({
+          author: req.body.author,
+          link: req.body.link,
+          description: req.body.description
+        });
+      }
+      res.render('./partials/photo', {gallery: gallery});
+    });
+});
+
 
 module.exports = router;
