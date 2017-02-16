@@ -1,3 +1,11 @@
 <h1>{{gallery.author}}</h1>
 <p>link: {{gallery.link}}</p>
 <p>description: {{gallery.description}}</p>
+<div style="display: inline-block" >
+<button target= "_" href="/gallery/{{gallery.id}}/edit">Update</button>
+
+<form method = "POST" action="/gallery/{{gallery.id}}?_method=DELETE">
+  <button type="submit">Delete</button>
+</form>
+
+</div>

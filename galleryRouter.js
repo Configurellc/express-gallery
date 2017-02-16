@@ -48,5 +48,16 @@ router.put('/:id/edit', function (req, res) {
     });
 });
 
+router.delete('/:id', function (req, res) {
+  Gallery.findById(req.params.id)
+    .then(function (gallery) {
+      if(gallery) {
+        gallery.destroy();
+
+      }
+    });
+  res.redirect('/');
+});
+
 
 module.exports = router;
