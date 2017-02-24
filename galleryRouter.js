@@ -2,8 +2,18 @@ const express = require('express');
 const router = express.Router();
 
 const db = require('./models');
-  const { Gallery } = db;
+const { Gallery } = db;
+const {Auth} = db;
 
+
+function isAuthenticated (req, res, next) {
+  if(req.isAuthenticated()){
+    next();
+  }else{
+    console.log('NO i havent');
+    res.redirect('/login');
+  }
+}
 router.post('/', function(req, res) {
     Gallery.create({
       author: req.body.author,
@@ -15,7 +25,7 @@ router.post('/', function(req, res) {
       });
   });
 
-router.get('/new', function (req, res) {
+router.get('/new', isAuthenticated, function (req, res) {
   res.render('./partials/new')
 });
 
@@ -27,7 +37,7 @@ router.get('/:id', function (req, res) {
     });
 });
 
-router.get('/:id/edit', function (req, res) {
+router.get('/:id/edit', isAuthenticated, function (req, res) {
   Gallery.findById(req.params.id)
     .then(function (gallery) {
       res.render('./partials/edit', {gallery: gallery});

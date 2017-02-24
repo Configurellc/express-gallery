@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const galleryRouter = require('./galleryRouter.js')
 const methodOverride = require('method-override')
+let path = require('path');
 
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session)
@@ -15,6 +16,7 @@ const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extend: true}));
   app.use(methodOverride('_method'));
+  app.use(express.static(path.join(__dirname, 'public')));
   app.use(session({
   secret: CONFIG.SESSION_SECRET,
   store: new RedisStore()
