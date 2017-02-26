@@ -1,5 +1,11 @@
 {{#each gallery}}
-<h1>{{author}}</h1>
-<p><img src="{{link}}" ></p>
-<p>description: {{description}}</p>
+  <div class="author_box">
+    <h1 class="author">{{author}}</h1>
+  </div>
+  <div class="picture_box">
+    <p class="picture"><img src="{{link}}" ></p>
+  </div>
+  <div class="descript_box">
+    <p class="descript">description: {{description}}</p>
+  </div>
 {{/each}}
