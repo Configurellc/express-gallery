@@ -14,7 +14,7 @@ function isAuthenticated (req, res, next) {
     res.redirect('/login');
   }
 }
-router.post('/', function(req, res) {
+router.post('/', isAuthenticated, function(req, res) {
     Gallery.create({
       author: req.body.author,
       link: req.body.link,
@@ -44,7 +44,7 @@ router.get('/:id/edit', isAuthenticated, function (req, res) {
     })
 })
 
-router.put('/:id/edit', function (req, res) {
+router.put('/:id/edit', isAuthenticated, function (req, res) {
   Gallery.findById(req.params.id)
     .then(function (gallery) {
       if(gallery) {
@@ -58,7 +58,7 @@ router.put('/:id/edit', function (req, res) {
     });
 });
 
-router.delete('/:id', function (req, res) {
+router.delete('/:id', isAuthenticated, function (req, res) {
   Gallery.findById(req.params.id)
     .then(function (gallery) {
       if(gallery) {
