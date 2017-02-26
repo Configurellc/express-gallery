@@ -19,8 +19,6 @@
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "postgres"
-  },
-  "SESSION_SECRET": "keyboard_cat",
-  "USER": "neo",
-  "PASSWORD": "password"
+  }
+
 }
