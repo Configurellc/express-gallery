@@ -1,16 +1,19 @@
+// jshint esversion:6
 const express = require('express');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
-const galleryRouter = require('./galleryRouter.js')
-const methodOverride = require('method-override')
+const galleryRouter = require('./galleryRouter.js');
+const methodOverride = require('method-override');
+const bcrypt = require('bcrypt');
 let path = require('path');
 
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session)
+const RedisStore = require('connect-redis')(session);
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const CONFIG = require('./config/config.json');
+const saltRounds =10;
 const app = express();
 
   app.use(bodyParser.json());
@@ -26,21 +29,39 @@ const app = express();
   app.use('/secret', isAuthenticated);
   app.use('/gallery', galleryRouter);
 
- const authenticate = (username, password) => {
-  // queries user data from the DB
- return Auth.findOne({where: {username: username, password: password}});
+//  const authenticate = (username, password) => {
+//   // queries user data from the DB
+//  return Auth.findOne({where: {username: username, password: password}});
 
-};
+// };
+  const hashCheck = (username, password, cb) => {
+    // bcrypt.compare(password, username.password, function(err, res) {
+
+    //   return res;
+    // });
+    return Auth.findOne({where: {username: username}})
+            .then(function (user) {
+              bcrypt.compare(password, user.password, function(err, res) {
+                console.log('my res', res);
+              return cb(res === true);
+              });
+            });
+  };
 
 passport.use(new LocalStrategy(
    function (username, password, done) {
   console.log('hey username, password: ', username, password);
   //returns results of query using promises and passes it into be checked
-      authenticate(username, password)
-        .then( username => {
-          return done(null, username);
-        });
+      hashCheck(username, password, function (isTrue) {
+        console.log('is true', isTrue);
 
+        if(isTrue) {
+        return done(null, username);
+
+        }else{
+          return done(null, false);
+        }
+      });
    }
 ));
 
@@ -61,7 +82,7 @@ const db = require('./models');
       extname: '.hbs',
       default: 'app'
   });
-    app.engine('hbs', hbs.engine)
+    app.engine('hbs', hbs.engine);
     app.set('view engine', 'hbs');
 
   app.get('/', function (req, res) {
@@ -71,7 +92,7 @@ const db = require('./models');
         gallery: gallery
       });
     });
-  })
+  });
 
   //authentication beyon this point
 
@@ -84,18 +105,40 @@ const db = require('./models');
     }
   }
 
+
+app.get('/user/new', function (req, res){
+
+  res.render('./partials/users');
+
+});
+
+app.post('/user/new', (req, res) => {
+  bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(req.body.password, salt, function(err, hash) {
+
+    Auth.create({
+      username: req.body.username,
+      password: hash
+      })
+      .then(function (gallery) {
+        res.redirect('/');
+      });
+    });
+
+  });
+});
   app.post('/login', passport.authenticate('local',
 
       {successRedirect: '/',
       failureRedirect: '/login'}));
 
   app.get('/secret', function (req, res) {
-    res.render('./secret')
+    res.render('./secret');
   });
 
 
   app.get('/login', function (req, res) {
-    res.render('./login')
+    res.render('./login');
   });
 
   // app.post('/login', function(req, res) {
